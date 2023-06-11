@@ -80,11 +80,13 @@
         // NOTE: Near miss found -- helpful error message. Long run: typecheckin/linting/enforcement could
         // strength ability to write data binding.
         formattedX: () => {
+          // Q: How should I express derived values?
+          //
+          // Suppose I have a value `x` and I want to render the same value with diferent variations..
+          // In React I might do something like <div>{`X = ${x}`}</div> or <div>{x * 100}</div>
+          //
+          // initially I tried to add a function here, wondering if I might be able to set .formattedX on a node
           `X = ${data.x}`;
-        },
-        x2: () => {
-          // How can I compute on a data value? e.g. "I want to format this value within a string"
-          return data.x;
         },
         // event handling that updates state
         // NOTE: i had to dig a little to find the event handler interface .. originally I tried something like
