@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div id="playground">
+      <h2>Objects and Arrays:</h2>
+      <div .y.z.[]></div>
+
+      <!-- I was wondering if this would override with undefined .. seems like yes -->
+      <!-- What behavior do you want for total misses (should they be errors? are they anticipating future state?) -->
+      <div .y.z.q>Invalid</div>
+
+      <h2>Data mutation:</h2>
+      <div>
+        X =
+        <span .x></span>
+      </div>
+      <div .formattedX></div>
+      <div .x2></div>
+
+      <!-- pressing down in "input" seems to have a slight visual delay before change propagates
+        (it gives the impression that the input box optimistically updates) -->
+      <input :assign-to=".x" type="number" />
+
+      <div>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+        <span .x></span>
+      </div>
+
+      <div>
+        z =
+        <span .z></span>
+      </div>
+
+      <!-- Dug into test.html in vivy.js repo to learn about `@{handler}` -->
+      <button @click=".onClick">Increase X</button>
+      <button @click=".onClickTwo">Toggle `z = 5` and `z = undefined`</button>
+
+      <!-- possible check for badly defined earlier? onClickThree isn't set, but firing is only a runtime error.. vs "near miss" warning -->
+      <button @click=".onClickThree">Call an undefined event handler</button>
+    </div>
+
+    <!--  Got confused for a bit b/c I tried to put some data manipulation outside of my root node -->
+    <!-- <div>
+      z =
+      <span .z></span>
+    </div> -->
+
+    <script src="./vivy.js"></script>
+    <script>
+      const data = {
+        table: {
+          rows: [
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+          ],
+        },
+        x: 5,
+        y: { z: [1, 2, 3] },
+        // NOTE: Near miss found -- helpful error message. Long run: typecheckin/linting/enforcement could
+        // strength ability to write data binding.
+        formattedX: () => {
+          `X = ${data.x}`;
+        },
+        x2: () => {
+          // How can I compute on a data value? e.g. "I want to format this value within a string"
+          return data.x;
+        },
+        // event handling that updates state
+        // NOTE: i had to dig a little to find the event handler interface .. originally I tried something like
+        // onClickV1: => {
+        //   console.log("OnClick");
+        //   data.x++; // .. maybe I'm suppoed to self-referentially update data?
+        // },
+
+        onClick: (_, obj) => {
+          console.log("onClick");
+          obj.x++;
+        },
+        onClickTwo: (_, obj) => {
+          console.log("onClickTwo");
+          if (obj.z) {
+            delete obj.z;
+          } else {
+            obj.z = 5;
+          }
+        },
+      };
+      const root = document.querySelector("#playground");
+      window.proxy = vivify(root, data);
+    </script>
+  </body>
+</html>
